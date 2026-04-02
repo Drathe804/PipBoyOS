@@ -1,0 +1,108 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>f8c61d5a-ceb9-4b0c-90dc-298ea112d86e</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>PipBoyOS.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>PipBoyOS</Name>
+    <RootNamespace>PipBoyOS</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="config.py" />
+    <Compile Include="crt.py" />
+    <Compile Include="games\atomic_command.py" />
+    <Compile Include="games\automatron.py" />
+    <Compile Include="games\grognak_ruby_ruins.py" />
+    <Compile Include="games\pipfall.py" />
+    <Compile Include="games\red_menace.py" />
+    <Compile Include="games\zeta_invaders.py" />
+    <Compile Include="PipBoyOS.py" />
+    <Compile Include="system\animation.py" />
+    <Compile Include="system\api_keys.example.py" />
+    <Compile Include="system\api_keys.py" />
+    <Compile Include="system\boot.py" />
+    <Compile Include="system\navigation.py" />
+    <Compile Include="system\__init__.py" />
+    <Compile Include="ui\data_screen.py" />
+    <Compile Include="ui\inventory_screen.py" />
+    <Compile Include="ui\map_screen.py" />
+    <Compile Include="ui\radio_screen.py" />
+    <Compile Include="ui\stat_screen.py" />
+    <Compile Include="ui\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="assets\" />
+    <Folder Include="assets\boot-success\" />
+    <Folder Include="assets\idle-walking\" />
+    <Folder Include="assets\icons\" />
+    <Folder Include="games\" />
+    <Folder Include="system\" />
+    <Folder Include="ui\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include="assets\boot-success\frame_00_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_01_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_02_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_03_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_04_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_05_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_06_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_07_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_08_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_09_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_10_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_11_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_12_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_13_delay-0.1s.gif" />
+    <Content Include="assets\boot-success\frame_14_delay-0.1s.gif" />
+    <Content Include="assets\icons\icon_aid.png" />
+    <Content Include="assets\icons\icon_apparel.png" />
+    <Content Include="assets\icons\icon_misc.png" />
+    <Content Include="assets\icons\icon_two_handed.png" />
+    <Content Include="assets\icons\icon_unarmed.png" />
+    <Content Include="assets\icons\icon_weapon.png" />
+    <Content Include="assets\idle-walking\frame_00_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_01_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_02_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_03_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_04_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_05_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_06_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_07_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_08_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_09_delay-0.2s.gif" />
+    <Content Include="assets\idle-walking\frame_10_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_11_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_12_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_13_delay-0.2s.gif" />
+    <Content Include="assets\idle-walking\frame_14_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_15_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_16_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_17_delay-0.1s.gif" />
+    <Content Include="assets\idle-walking\frame_18_delay-0.1s.gif" />
+    <Content Include="inventory.json" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

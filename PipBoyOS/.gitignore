@@ -1,0 +1,8 @@
+# .gitignore
+
+# Ignore API keys
+api_keys.py
+
+# Ignore Python cache folders (keeps your repo clean!)
+__pycache__/
+*.pyc

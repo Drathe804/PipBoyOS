@@ -1,0 +1,107 @@
+{
+  "weapons": [
+    {
+      "name": "10mm Pistol",
+      "type": "weapon",
+      "weight": 3.5,
+      "value": 50,
+      "damage": 18
+    },
+    {
+      "name": "Combat Shotgun",
+      "type": "weapon",
+      "weight": 11.0,
+      "value": 150,
+      "damage": 50
+    }
+  ],
+  "apparel": [
+    {
+      "name": "Vault 76 Jumpsuit",
+      "type": "apparel",
+      "weight": 1.0,
+      "value": 20,
+      "dr": 5
+    },
+    {
+      "name": "Leather Armor",
+      "type": "apparel",
+      "weight": 5.0,
+      "value": 45,
+      "dr": 15
+    }
+  ],
+  "aid": [
+    {
+      "name": "Stimpak (x4)",
+      "type": "aid",
+      "weight": 0.0,
+      "value": 25,
+      "effect": "+30 HP"
+    },
+    {
+      "name": "Radaway (x2)",
+      "type": "aid",
+      "weight": 0.1,
+      "value": 40,
+      "effect": "-100 Rads"
+    },
+    {
+      "name": "Purified Water",
+      "type": "aid",
+      "weight": 0.5,
+      "value": 20,
+      "effect": "Hydration"
+    }
+  ],
+  "misc": [
+    {
+      "name": "Holotape: Atomic Command",
+      "type": "misc",
+      "weight": 0.5,
+      "value": 150,
+      "game": "AtomicCommand"
+    },
+    {
+      "name": "Holotape: Red Menace",
+      "type": "misc",
+      "weight": 0.5,
+      "value": 150,
+      "game": "RedMenace"
+    },
+    {
+      "name": "Holotape: Pipfall",
+      "type": "misc",
+      "weight": 0.5,
+      "value": 150,
+      "game": "Pipfall"
+    },
+    {
+      "name": "Holotape: Automatron",
+      "type": "misc",
+      "weight": 0.5,
+      "value": 150,
+      "game": "Automatron"
+    },
+    {
+      "name": "Holotape: Zeta Invaders",
+      "type": "misc",
+      "weight": 0.5,
+      "value": 150,
+      "game": "ZetaInvaders"
+    },
+    {
+      "name": "Holotape: Ruby Ruins",
+      "type": "misc",
+      "weight": 0.5,
+      "value": 150,
+      "game": "RubyRuins"
+    },
+    {
+      "name": "Bobby Pin (x12)",
+      "type": "misc",
+      "weight": 0.0,
+      "value": 1
+    }
+  ]
+}
