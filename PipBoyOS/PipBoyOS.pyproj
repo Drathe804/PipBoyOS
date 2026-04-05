@@ -34,6 +34,7 @@
     <Compile Include="system\api_keys.example.py" />
     <Compile Include="system\api_keys.py" />
     <Compile Include="system\boot.py" />
+    <Compile Include="system\hardware_controls.py" />
     <Compile Include="system\navigation.py" />
     <Compile Include="system\__init__.py" />
     <Compile Include="ui\data_screen.py" />
@@ -69,6 +70,7 @@
     <Content Include="assets\boot-success\frame_12_delay-0.1s.gif" />
     <Content Include="assets\boot-success\frame_13_delay-0.1s.gif" />
     <Content Include="assets\boot-success\frame_14_delay-0.1s.gif" />
+    <Content Include="assets\enemy_missile.png" />
     <Content Include="assets\icons\icon_aid.png" />
     <Content Include="assets\icons\icon_apparel.png" />
     <Content Include="assets\icons\icon_misc.png" />

@@ -13,6 +13,7 @@ from ui.data_screen import draw_data_tab
 from ui.map_screen import draw_map_tab
 from ui.radio_screen import draw_radio_tab
 from ui.map_screen import draw_map_tab, reset_map_cursor
+from system.hardware_controls import PipBoyHardware
 
 # --- 1. SETUP ---
 pygame.init()
@@ -24,6 +25,10 @@ large_font = pygame.font.Font("fallout.ttf", 48)
 
 crt_filter = CRTFilter()
 boot_manager = BootManager()
+
+# Start listening to the GPIO pins in the background!
+hardware_listener = PipBoyHardware()
+
 walk_anim = SpriteAnimation("assets/idle-walking", frame_rate=100, scale=0.5) # Adjust frame_rate to make him walk faster/slower
 
 current_state = "BOOTING" 
@@ -40,6 +45,7 @@ sub_active_data = 0
 sub_active_map = 0
 sub_active_radio = 0
 item_index = 0
+quitting_completely = False
 
 active_game = None
 
@@ -57,15 +63,22 @@ while running:
             running = False
 
         if event.type == pygame.KEYDOWN:
-            # --- THE POWER BUTTON ---
-            if event.key == pygame.K_p:
+            # --- NEW: THE HARD QUIT BUTTON (F12) ---
+            if event.key == pygame.K_F12:
+                current_state = "POWERING_OFF"
+                power_anim_timer = 40 
+                quitting_completely = True # Tell it to close when the animation finishes!
+
+            # --- THE SLEEP BUTTON (P) ---
+            elif event.key == pygame.K_p:
                 if current_state in ["MAIN_MENU", "BOOTING"]:
                     current_state = "POWERING_OFF"
-                    power_anim_timer = 40 # The animation will last 40 frames
+                    power_anim_timer = 40 
+                    quitting_completely = False # Just go to sleep normally
                 elif current_state == "POWERED_OFF":
-                    # Wake it back up by rebooting the OS!
-                    boot_manager.__init__() # Resets the boot sequence
+                    boot_manager.__init__() 
                     current_state = "BOOTING" 
+
             
             # --- EXISTING MAIN MENU CONTROLS ---
             elif current_state == "MAIN_MENU": 
@@ -121,6 +134,11 @@ while running:
                             if game_id == "AtomicCommand":
                                 from games.atomic_command import AtomicCommand
                                 active_game = AtomicCommand()
+                                current_state = "PLAYING_HOLOTAPE"
+
+                            elif game_id == "RedMenace":
+                                from games.red_menace import RedMenace
+                                active_game = RedMenace()
                                 current_state = "PLAYING_HOLOTAPE"
                                 
                             # We will add RedMenace, Pipfall, etc., here later!
@@ -217,6 +235,13 @@ while running:
         power_anim_timer -= 1
         if power_anim_timer <= 0:
             current_state = "POWERED_OFF"
+        
+        # When the animation hits zero, decide what to do!
+        if power_anim_timer <= 0:
+            if quitting_completely:
+                running = False # Kills the main loop, closing the OS entirely!
+            else:
+                current_state = "POWERED_OFF" # Just goes to sleep mode
 
     # === NEW: SLEEP MODE ===
     elif current_state == "POWERED_OFF":
