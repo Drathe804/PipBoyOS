@@ -36,11 +36,13 @@
     <Compile Include="system\boot.py" />
     <Compile Include="system\hardware_controls.py" />
     <Compile Include="system\navigation.py" />
+    <Compile Include="system\theme.py" />
     <Compile Include="system\__init__.py" />
     <Compile Include="ui\data_screen.py" />
     <Compile Include="ui\inventory_screen.py" />
     <Compile Include="ui\map_screen.py" />
     <Compile Include="ui\radio_screen.py" />
+    <Compile Include="ui\settings_screen.py" />
     <Compile Include="ui\stat_screen.py" />
     <Compile Include="ui\__init__.py" />
   </ItemGroup>
@@ -49,6 +51,7 @@
     <Folder Include="assets\boot-success\" />
     <Folder Include="assets\idle-walking\" />
     <Folder Include="assets\icons\" />
+    <Folder Include="assets\demo\" />
     <Folder Include="games\" />
     <Folder Include="system\" />
     <Folder Include="ui\" />
@@ -70,6 +73,21 @@
     <Content Include="assets\boot-success\frame_12_delay-0.1s.gif" />
     <Content Include="assets\boot-success\frame_13_delay-0.1s.gif" />
     <Content Include="assets\boot-success\frame_14_delay-0.1s.gif" />
+    <Content Include="assets\demo\pipboy_active_barbie_theme.jpg" />
+    <Content Include="assets\demo\pipboy_atomic_command.jpg" />
+    <Content Include="assets\demo\pipboy_atomic_command_game_over.jpg" />
+    <Content Include="assets\demo\pipboy_atomic_command_wave_complete.jpg" />
+    <Content Include="assets\demo\pipboy_barbie_theme.jpg" />
+    <Content Include="assets\demo\pipboy_boot_sequence_full.jpg" />
+    <Content Include="assets\demo\pipboy_boot_success.jpg" />
+    <Content Include="assets\demo\pipboy_custom_theme_gold.jpg" />
+    <Content Include="assets\demo\pipboy_custom_theme_purple.jpg" />
+    <Content Include="assets\demo\pipboy_demo.mp4" />
+    <Content Include="assets\demo\pipboy_inventory.jpg" />
+    <Content Include="assets\demo\pipboy_radio_rx.jpg" />
+    <Content Include="assets\demo\pipboy_radio_tx.jpg" />
+    <Content Include="assets\demo\pipboy_zoomed_in_map_with_markers.jpg" />
+    <Content Include="assets\demo\pipboy_zoomed_out_map_with_markers.jpg" />
     <Content Include="assets\enemy_missile.png" />
     <Content Include="assets\icons\icon_aid.png" />
     <Content Include="assets\icons\icon_apparel.png" />

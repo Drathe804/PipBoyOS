@@ -1,7 +1,8 @@
 # ui/data_screen.py
 import pygame
-from config import GREEN, BLACK, WIDTH, HEIGHT
+from config import BLACK, WIDTH, HEIGHT
 from system.animation import TabAnimator # Import our new tool!
+from system.theme import active_theme
 
 # Create an animator specifically for the inventory screen
 inv_animator = TabAnimator()
@@ -73,10 +74,10 @@ def draw_data_tab(screen, font, sub_tabs_data, sub_active_data, item_index):
             # --- NEW: Solid Block Highlight ---
             item_text = font.render(item, True, BLACK)
             highlight_rect = pygame.Rect(15, start_y + (i * 25) - 2, 200, 20)
-            pygame.draw.rect(screen, GREEN, highlight_rect)
+            pygame.draw.rect(screen, active_theme.color, highlight_rect)
             screen.blit(item_text, (20, start_y + (i * 25) - 2))
         else:
-            item_text = font.render(item, True, GREEN)
+            item_text = font.render(item, True, active_theme.color)
             screen.blit(item_text, (20, start_y + (i * 25))) 
 
     # 3. DYNAMIC RIGHT SIDE DETAILS
@@ -90,19 +91,19 @@ def draw_data_tab(screen, font, sub_tabs_data, sub_active_data, item_index):
         if data["type"] == "quest":
             # Vault Boy Placeholder Box (Top Right)
             vb_box = pygame.Rect(WIDTH - 120, 70, 60, 80)
-            pygame.draw.rect(screen, GREEN, vb_box, 1)
-            vb_text = font.render("VB", True, GREEN)
+            pygame.draw.rect(screen, active_theme.color, vb_box, 1)
+            vb_text = font.render("VB", True, active_theme.color)
             screen.blit(vb_text, vb_text.get_rect(center=vb_box.center))
 
             # Horizontal Divider Line
             line_y = 160
-            pygame.draw.line(screen, GREEN, (WIDTH - 240, line_y), (WIDTH - 20, line_y), 1)
+            pygame.draw.line(screen, active_theme.color, (WIDTH - 240, line_y), (WIDTH - 20, line_y), 1)
 
             # Draw Objectives List
             obj_y = line_y + 10
             for checkbox, step_text in data.get("steps", []):
-                check_text = font.render(checkbox, True, GREEN)
-                step_render = font.render(step_text, True, GREEN)
+                check_text = font.render(checkbox, True, active_theme.color)
+                step_render = font.render(step_text, True, active_theme.color)
                 
                 screen.blit(check_text, (WIDTH - 240, obj_y))
                 screen.blit(step_render, (WIDTH - 210, obj_y))
@@ -115,11 +116,11 @@ def draw_data_tab(screen, font, sub_tabs_data, sub_active_data, item_index):
             stat_y = 80
             for stat_name, stat_val in data.get("stats", []):
                 # Left align the stat name
-                name_text = font.render(stat_name, True, GREEN)
+                name_text = font.render(stat_name, True, active_theme.color)
                 screen.blit(name_text, (WIDTH - 240, stat_y))
                 
                 # Right align the stat value
-                val_text = font.render(stat_val, True, GREEN)
+                val_text = font.render(stat_val, True, active_theme.color)
                 val_rect = val_text.get_rect(topright=(WIDTH - 20, stat_y))
                 screen.blit(val_text, val_rect)
                 

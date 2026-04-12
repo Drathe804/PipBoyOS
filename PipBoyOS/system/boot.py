@@ -1,6 +1,7 @@
 # system/boot.py
 import pygame
-from config import GREEN, boot_lines, WIDTH, HEIGHT
+from config import boot_lines, WIDTH, HEIGHT
+from system.theme import active_theme
 from system.animation import SpriteAnimation
 
 class BootManager:
@@ -41,14 +42,14 @@ class BootManager:
 
         if self.state in ["BOOT_TEXT", "SCROLL_UP"]:
             for i in range(self.current_line):
-                text_surface = font.render(boot_lines[i], True, GREEN)
+                text_surface = font.render(boot_lines[i], True, active_theme.color)
                 screen.blit(text_surface, (10, 10 + (i * 25) + self.scroll_y))
 
             if self.current_line < len(boot_lines):
                 text_to_render = boot_lines[self.current_line][:self.current_char]
                 if current_time % 600 < 300: 
                     text_to_render += "_"
-                text_surface = font.render(text_to_render, True, GREEN)
+                text_surface = font.render(text_to_render, True, active_theme.color)
                 screen.blit(text_surface, (10, 10 + (self.current_line * 25) + self.scroll_y))
 
         # --- UPDATED FADE_LOGO SECTIONS ---
@@ -66,7 +67,7 @@ class BootManager:
                 screen.blit(current_img, img_rect)
 
             # 2. Draw the "Success!" text underneath it
-            success_text = font.render("Success!", True, GREEN)
+            success_text = font.render("Success!", True, active_theme.color)
             success_text.set_alpha(self.logo_alpha)
             text_rect = success_text.get_rect(center=(WIDTH/2, HEIGHT/2 + 60))
             screen.blit(success_text, text_rect)

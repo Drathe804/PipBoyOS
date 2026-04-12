@@ -4,16 +4,16 @@
 WIDTH, HEIGHT = 480, 320 
 
 # Colors
-GREEN = (50, 255, 50)
+GREEN = (50, 255, 50) # <-- FIXED! This prevents the boot crash!
 BLACK = (0, 0, 0)
 
 # Menu Navigation
 tabs = ["STAT", "INV", "DATA", "MAP", "RADIO"]
 sub_tabs_stat = ["STATUS", "SPECIAL", "PERKS"]
 sub_tabs_inv = ["WEAPONS", "APPAREL", "AID", "MISC"]
-sub_tabs_data = ["QUESTS", "PROJECTS", "LOGS"]
+sub_tabs_data = ["QUESTS", "PROJECTS", "LOGS", "SETTINGS"]
 sub_tabs_map = ["LOCAL", "WORLD"]
-sub_tabs_radio = ["STATIONS", "PODCASTS"]
+sub_tabs_radio = ["STATIONS", "PODCASTS", "TRANSCEIVER"]
 
 # Boot Sequence Text
 boot_lines = [

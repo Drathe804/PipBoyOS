@@ -14,6 +14,8 @@ from ui.map_screen import draw_map_tab
 from ui.radio_screen import draw_radio_tab
 from ui.map_screen import draw_map_tab, reset_map_cursor
 from system.hardware_controls import PipBoyHardware
+from system.theme import active_theme
+from ui.settings_screen import draw_settings_tab
 
 # --- 1. SETUP ---
 pygame.init()
@@ -26,10 +28,9 @@ large_font = pygame.font.Font("fallout.ttf", 48)
 crt_filter = CRTFilter()
 boot_manager = BootManager()
 
-# Start listening to the GPIO pins in the background!
 hardware_listener = PipBoyHardware()
 
-walk_anim = SpriteAnimation("assets/idle-walking", frame_rate=100, scale=0.5) # Adjust frame_rate to make him walk faster/slower
+walk_anim = SpriteAnimation("assets/idle-walking", frame_rate=100, scale=0.5) 
 
 current_state = "BOOTING" 
 running = True
@@ -49,130 +50,177 @@ quitting_completely = False
 
 active_game = None
 
+# --- NEW RADIO & SETTINGS VARIABLES ---
+vfo_mode = False
+manual_freq = 462.0000
+saved_channels = []
+radio_power_on = False 
+is_transmitting = False
+power_press_time = 0
+radio_press_time = 0 
+rgb_mode = False # NEW: Slider lock tracker
+
 # --- 2. MAIN LOOP ---
 while running:
     current_time = pygame.time.get_ticks()
     
-    # Grab all events and key states ONCE per frame
     events = pygame.event.get()
     keys = pygame.key.get_pressed()
-
 
     for event in events:
         if event.type == pygame.QUIT:
             running = False
 
         if event.type == pygame.KEYDOWN:
-            # --- NEW: THE HARD QUIT BUTTON (F12) ---
             if event.key == pygame.K_F12:
                 current_state = "POWERING_OFF"
                 power_anim_timer = 40 
-                quitting_completely = True # Tell it to close when the animation finishes!
+                quitting_completely = True 
 
-            # --- THE SLEEP BUTTON (P) ---
             elif event.key == pygame.K_p:
-                if current_state in ["MAIN_MENU", "BOOTING"]:
-                    current_state = "POWERING_OFF"
-                    power_anim_timer = 40 
-                    quitting_completely = False # Just go to sleep normally
-                elif current_state == "POWERED_OFF":
-                    boot_manager.__init__() 
-                    current_state = "BOOTING" 
+                power_press_time = pygame.time.get_ticks()
 
+            elif event.key == pygame.K_t:
+                radio_press_time = pygame.time.get_ticks()
+                if radio_power_on:
+                    is_transmitting = True 
             
-            # --- EXISTING MAIN MENU CONTROLS ---
             elif current_state == "MAIN_MENU": 
                 if event.key in (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN):
                     item_index = 0
                     reset_map_cursor()
                 
-                # --- W & S: List Scrolling ---
+                # --- W & S: List Scrolling, VFO, OR RGB Sliders! ---
                 if event.key == pygame.K_s:
-                    item_index += 1
+                    if active_tab == 4 and vfo_mode:
+                        manual_freq -= 0.0125
+                    elif active_tab == 2 and sub_active_data == 3 and rgb_mode:
+                        # Dial the color down! (Math trick to get 0, 1, or 2)
+                        c_idx = (item_index % 6) - 3 
+                        active_theme.custom_rgb[c_idx] = max(0, active_theme.custom_rgb[c_idx] - 5)
+                        active_theme.update_custom_color(*active_theme.custom_rgb)
+                    else:
+                        item_index += 1
+
                 elif event.key == pygame.K_w:
-                    item_index -= 1
+                    if active_tab == 4 and vfo_mode:
+                        manual_freq += 0.0125
+                    elif active_tab == 2 and sub_active_data == 3 and rgb_mode:
+                        # Dial the color up!
+                        c_idx = (item_index % 6) - 3 
+                        active_theme.custom_rgb[c_idx] = min(255, active_theme.custom_rgb[c_idx] + 5)
+                        active_theme.update_custom_color(*active_theme.custom_rgb)
+                    else:
+                        item_index -= 1
 
                 # --- LEFT & RIGHT: Main Tabs ---
                 if event.key == pygame.K_RIGHT:
                     active_tab = (active_tab + 1) % len(tabs)
                     glitch_timer = 6 
-                    # Pick a random roll speed! 0 means no roll.
                     roll_speed = random.choice([0, 0, 40, -40, 60, -60]) 
-                    if active_tab == 3: 
-                        reset_map_cursor()
+                    if active_tab == 3: reset_map_cursor()
                         
                 elif event.key == pygame.K_LEFT:
                     active_tab = (active_tab - 1) % len(tabs)
                     glitch_timer = 6 
                     roll_speed = random.choice([0, 0, 40, -40, 60, -60]) 
-                    if active_tab == 3: 
-                        reset_map_cursor()
+                    if active_tab == 3: reset_map_cursor()
                 
-                elif active_tab == 0: # We are on STAT
-                    if event.key == pygame.K_DOWN:
-                        sub_active_stat = (sub_active_stat + 1) % len(sub_tabs_stat)
-                    elif event.key == pygame.K_UP:
-                        sub_active_stat = (sub_active_stat - 1) % len(sub_tabs_stat)
+                elif active_tab == 0: 
+                    if event.key == pygame.K_DOWN: sub_active_stat = (sub_active_stat + 1) % len(sub_tabs_stat)
+                    elif event.key == pygame.K_UP: sub_active_stat = (sub_active_stat - 1) % len(sub_tabs_stat)
                         
-                elif active_tab == 1: # We are on INV
-                    if event.key == pygame.K_DOWN:
-                        sub_active_inv = (sub_active_inv + 1) % len(sub_tabs_inv)
-                        item_index = 0 # Reset scrolling when switching sub-tabs
-                    elif event.key == pygame.K_UP:
-                        sub_active_inv = (sub_active_inv - 1) % len(sub_tabs_inv)
-                        item_index = 0
+                elif active_tab == 1: 
+                    if event.key == pygame.K_DOWN: sub_active_inv = (sub_active_inv + 1) % len(sub_tabs_inv)
+                    elif event.key == pygame.K_UP: sub_active_inv = (sub_active_inv - 1) % len(sub_tabs_inv)
                         
-                    # --- THE HOLOTAPE LAUNCHER ---
-                    elif event.key == pygame.K_RETURN: # The ENTER key
+                elif active_tab == 2: 
+                    if event.key == pygame.K_DOWN: sub_active_data = (sub_active_data + 1) % len(sub_tabs_data)
+                    elif event.key == pygame.K_UP: sub_active_data = (sub_active_data - 1) % len(sub_tabs_data)
+
+                elif active_tab == 3: 
+                    if event.key == pygame.K_DOWN: sub_active_map = (sub_active_map + 1) % len(sub_tabs_map)
+                    elif event.key == pygame.K_UP: sub_active_map = (sub_active_map - 1) % len(sub_tabs_map)
+
+                elif active_tab == 4: 
+                    if event.key == pygame.K_DOWN: sub_active_radio = (sub_active_radio + 1) % len(sub_tabs_radio)
+                    elif event.key == pygame.K_UP: sub_active_radio = (sub_active_radio - 1) % len(sub_tabs_radio)
+
+                # --- THE ENTER KEY ---
+                if event.key == pygame.K_RETURN: 
+                    if active_tab == 1: 
                         from ui.inventory_screen import get_selected_inventory_item
-                        
                         selected_item = get_selected_inventory_item(sub_active_inv, item_index)
                         
                         if selected_item and "game" in selected_item:
                             game_id = selected_item["game"]
-                            
                             if game_id == "AtomicCommand":
                                 from games.atomic_command import AtomicCommand
                                 active_game = AtomicCommand()
                                 current_state = "PLAYING_HOLOTAPE"
-
                             elif game_id == "RedMenace":
                                 from games.red_menace import RedMenace
                                 active_game = RedMenace()
                                 current_state = "PLAYING_HOLOTAPE"
                                 
-                            # We will add RedMenace, Pipfall, etc., here later!
+                    elif active_tab == 4 and sub_active_radio == 2: 
+                        transceiver_items = 3 + len(saved_channels) 
+                        if (item_index % transceiver_items) == (transceiver_items - 1):
+                            vfo_mode = not vfo_mode 
 
-                        
-                elif active_tab == 2: # We are on DATA
-                    if event.key == pygame.K_DOWN:
-                        sub_active_data = (sub_active_data + 1) % len(sub_tabs_data)
-                    elif event.key == pygame.K_UP:
-                        sub_active_data = (sub_active_data - 1) % len(sub_tabs_data)
+                    # NEW: Theme & RGB Selector for the DATA Tab!
+                    elif active_tab == 2 and sub_active_data == 3: 
+                        idx = item_index % 6
+                        if idx <= 2: 
+                            # They clicked a Theme!
+                            themes = ["DEFAULT", "BARBIE", "CUSTOM"]
+                            active_theme.apply_theme(themes[idx])
+                            try:
+                                walk_anim = SpriteAnimation(active_theme.walk_sprite, frame_rate=100, scale=0.5)
+                            except Exception as e:
+                                pass # Silently ignore if you haven't added the Barbie assets to the folder yet
+                        else: 
+                            # They clicked an RGB Slider!
+                            rgb_mode = not rgb_mode
 
-                elif active_tab == 3: # We are on MAP
-                    if event.key == pygame.K_DOWN:
-                        sub_active_map = (sub_active_map + 1) % len(sub_tabs_map)
-                    elif event.key == pygame.K_UP:
-                        sub_active_map = (sub_active_map - 1) % len(sub_tabs_map)
-
-                elif active_tab == 4: # We are on RADIO
-                    if event.key == pygame.K_DOWN:
-                        sub_active_radio = (sub_active_radio + 1) % len(sub_tabs_radio)
-                    elif event.key == pygame.K_UP:
-                        sub_active_radio = (sub_active_radio - 1) % len(sub_tabs_radio)
-
-            # --- NEW: GUARANTEED HOLOTAPE EXIT ---
             elif current_state == "PLAYING_HOLOTAPE":
                 if event.key in (pygame.K_TAB, pygame.K_ESCAPE):
                     active_game = None
                     current_state = "MAIN_MENU"
 
+            elif event.key == pygame.K_LEFTBRACKET: 
+                manual_freq -= 0.0125
+            elif event.key == pygame.K_RIGHTBRACKET: 
+                manual_freq += 0.0125
+
+
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_p:
+                press_duration = pygame.time.get_ticks() - power_press_time
+                if press_duration > 1500:
+                    current_state = "POWERING_OFF"
+                    power_anim_timer = 40 
+                    quitting_completely = True 
+                else:
+                    if current_state in ["MAIN_MENU", "BOOTING", "PLAYING_HOLOTAPE"]:
+                        current_state = "POWERING_OFF"
+                        power_anim_timer = 40 
+                        quitting_completely = False 
+                    elif current_state == "POWERED_OFF":
+                        boot_manager.__init__() 
+                        current_state = "BOOTING"
+
+            elif event.key == pygame.K_t:
+                is_transmitting = False 
+                radio_duration = pygame.time.get_ticks() - radio_press_time
+                if radio_duration < 500: 
+                    radio_power_on = not radio_power_on
+
+
     screen.fill(BLACK) 
 
     # --- 3. STATE MACHINE ---
     if current_state == "BOOTING":
-        # Let the BootManager handle everything, just ask it for its status
         status = boot_manager.update_and_draw(screen, font, large_font, current_time)
         if status == "DONE":
             current_state = "MAIN_MENU"
@@ -180,101 +228,72 @@ while running:
     elif current_state == "MAIN_MENU":
         draw_navigation(screen, font, tabs, active_tab)
         
-        # Tab-Specific Content
         if active_tab == 0: 
             draw_stat_tab(screen, font, sub_tabs_stat, sub_active_stat, walk_anim, current_time)
         elif active_tab == 1:
             draw_inventory_tab(screen, font, sub_tabs_inv, sub_active_inv, item_index)
         elif active_tab == 2:
-            draw_data_tab(screen, font, sub_tabs_data, sub_active_data, item_index)
+            # Check if we are on the brand new SETTINGS sub-tab!
+            if sub_active_data == 3:
+                draw_settings_tab(screen, font, sub_tabs_data, sub_active_data, item_index, active_theme, rgb_mode, current_time)
+            else:
+                draw_data_tab(screen, font, sub_tabs_data, sub_active_data, item_index)
         elif active_tab == 3:
-            # Pass keys and events at the end!
             draw_map_tab(screen, font, sub_tabs_map, sub_active_map, current_time, keys, events)
-
         elif active_tab == 4:
-            draw_radio_tab(screen, font, sub_tabs_radio, sub_active_radio, current_time, item_index)
+            draw_radio_tab(screen, font, sub_tabs_radio, sub_active_radio, current_time, item_index, vfo_mode, manual_freq, saved_channels, radio_power_on, is_transmitting)
 
     elif current_state == "PLAYING_HOLOTAPE":
         screen.fill(BLACK)
-        
-        if active_game: # Safety check!
-            # Pass the events list into the cartridge!
+        if active_game: 
             active_game.update(events) 
             active_game.draw(screen)
 
-
-    # === NEW: THE CRT POWER DOWN ANIMATION ===
     elif current_state == "POWERING_OFF":
         screen.fill(BLACK)
-        
-        # Calculate progress from 1.0 (start) down to 0.0 (end)
         progress = power_anim_timer / 40.0 
         
         if progress > 0.5:
-            # Stage 1: The screen violently collapses vertically into a bright horizontal line
-            # It maps the top 50% of the timer to shrinking the height
             h_progress = (progress - 0.5) * 2 
             h = int(HEIGHT * h_progress)
             w = WIDTH
         else:
-            # Stage 2: The horizontal line rapidly shrinks into a dot
-            # It maps the bottom 50% of the timer to shrinking the width
             w_progress = progress * 2
-            h = 4 # Keep it 4 pixels thick
+            h = 4 
             w = int(WIDTH * w_progress)
 
-        # Ensure the dot never completely disappears until the timer hits 0
         if h < 4: h = 4
         if w < 4: w = 4
 
-        # Draw the glowing collapsed beam exactly in the center of the screen
         beam_rect = pygame.Rect(0, 0, w, h)
         beam_rect.center = (WIDTH // 2, HEIGHT // 2)
-        pygame.draw.rect(screen, GREEN, beam_rect)
+        pygame.draw.rect(screen, active_theme.color, beam_rect)
 
         power_anim_timer -= 1
         if power_anim_timer <= 0:
-            current_state = "POWERED_OFF"
-        
-        # When the animation hits zero, decide what to do!
-        if power_anim_timer <= 0:
             if quitting_completely:
-                running = False # Kills the main loop, closing the OS entirely!
+                running = False 
             else:
-                current_state = "POWERED_OFF" # Just goes to sleep mode
+                current_state = "POWERED_OFF" 
 
-    # === NEW: SLEEP MODE ===
     elif current_state == "POWERED_OFF":
-        # The OS is asleep. Draw nothing but pure black.
         screen.fill(BLACK)
 
     # --- 4. POST-PROCESSING ---
-    
-    # === THE FALLOUT 3 CRT GLITCH ===
     if glitch_timer > 0:
-        
-        # --- 1. THE V-SYNC ROLL ---
         if roll_speed != 0:
-            # Calculate how far the screen has shifted up or down
             roll_y = (glitch_timer * roll_speed) % HEIGHT
-            
-            # Copy the pristine screen before we mess it up
             screen_copy = screen.copy()
             screen.fill(BLACK)
-            
-            # Draw it shifted
             screen.blit(screen_copy, (0, roll_y))
-            
-            # Draw the piece that got cut off wrapping around to the other side!
             if roll_y > 0:
                 screen.blit(screen_copy, (0, roll_y - HEIGHT))
             else:
                 screen.blit(screen_copy, (0, roll_y + HEIGHT))
 
-        # --- 2. THE HORIZONTAL TEAR ---
         tear_y = random.randint(0, HEIGHT - 40)
-        tear_h = random.randint(20, 40)       # Your upgraded violent height!
-        tear_offset = random.randint(-55, 55) # Your upgraded violent offset!
+        tear_h = random.randint(20, 40)       
+        tear_offset = random.randint(-55, 55) 
         
         slice_rect = pygame.Rect(0, tear_y, WIDTH, tear_h)
         screen_slice = screen.subsurface(slice_rect).copy()
@@ -282,13 +301,11 @@ while running:
         pygame.draw.rect(screen, BLACK, slice_rect)
         screen.blit(screen_slice, (tear_offset, tear_y))
 
-        # --- 3. STATIC TRACKING LINES ---
         for _ in range(4):
             line_y = random.randint(0, HEIGHT)
-            pygame.draw.line(screen, GREEN, (0, line_y), (WIDTH, line_y), 1)
+            pygame.draw.line(screen, active_theme.color, (0, line_y), (WIDTH, line_y), 1)
 
         glitch_timer -= 1 
-
 
     crt_filter.draw(screen)
 

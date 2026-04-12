@@ -1,7 +1,8 @@
 # system/animation.py
 import pygame
 import os
-from config import GREEN, BLACK
+from config import BLACK
+from system.theme import active_theme
 
 
 class SpriteAnimation:
@@ -77,12 +78,12 @@ class TabAnimator:
 
         # 3. Draw Box
         highlight_rect = pygame.Rect(self.anim_x, start_y, self.anim_w, 20)
-        pygame.draw.rect(screen, GREEN, highlight_rect)
+        pygame.draw.rect(screen, active_theme.color, highlight_rect)
         
         # 4. Draw Text
         current_x = start_x
         for i, sub in enumerate(tabs_list):
-            color = BLACK if i == active_index else GREEN
+            color = BLACK if i == active_index else active_theme.color
             sub_text = font.render(sub, True, color)
             
             screen.blit(sub_text, (current_x + 6, start_y + 2))

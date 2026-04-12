@@ -3,9 +3,10 @@ import pygame
 import math
 import random
 import os
-from config import GREEN, BLACK, WIDTH, HEIGHT
+from config import BLACK, WIDTH, HEIGHT
+from system.theme import active_theme
 
-# Helper to tint your custom missile PNG to Pip-Boy green!
+# Helper to tint your custom missile PNG to Pip-Boy active_theme.color!
 def tint_image(image, color):
     tinted = image.copy()
     tinted.fill(color, special_flags=pygame.BLEND_RGB_MULT)
@@ -39,7 +40,7 @@ class AtomicCommand:
             raw_img = pygame.image.load(img_path).convert_alpha()
             # FIXED: Scaled to a perfect square (24x24) so it doesn't crush the pixels!
             scaled = pygame.transform.smoothscale(raw_img, (24, 24)) 
-            self.missile_img = tint_image(scaled, GREEN)
+            self.missile_img = tint_image(scaled, active_theme.color)
 
         
         self.cities = [
@@ -184,12 +185,12 @@ class AtomicCommand:
     # --- DRAW HELPERS ---
     def draw_city(self, screen, x, y, alive):
         if alive:
-            pygame.draw.rect(screen, GREEN, (x, y - 15, 12, 15))      
-            pygame.draw.rect(screen, GREEN, (x + 14, y - 25, 14, 25)) 
-            pygame.draw.rect(screen, GREEN, (x + 30, y - 10, 10, 10)) 
+            pygame.draw.rect(screen, active_theme.color, (x, y - 15, 12, 15))      
+            pygame.draw.rect(screen, active_theme.color, (x + 14, y - 25, 14, 25)) 
+            pygame.draw.rect(screen, active_theme.color, (x + 30, y - 10, 10, 10)) 
         else:
-            pygame.draw.rect(screen, GREEN, (x, y - 4, 40, 4))
-            pygame.draw.rect(screen, GREEN, (x + 10, y - 8, 20, 4))
+            pygame.draw.rect(screen, active_theme.color, (x, y - 4, 40, 4))
+            pygame.draw.rect(screen, active_theme.color, (x + 10, y - 8, 20, 4))
 
     def draw_turret(self, screen):
         """Draws a base, a dome, and a dynamic rotating barrel."""
@@ -199,24 +200,24 @@ class AtomicCommand:
         angle = math.atan2(self.cross_y - ty, self.cross_x - tx)
         
         # 1. Base
-        pygame.draw.rect(screen, GREEN, (tx - 30, HEIGHT - 20, 60, 20))
-        pygame.draw.rect(screen, GREEN, (tx - 20, HEIGHT - 25, 40, 5))
+        pygame.draw.rect(screen, active_theme.color, (tx - 30, HEIGHT - 20, 60, 20))
+        pygame.draw.rect(screen, active_theme.color, (tx - 20, HEIGHT - 25, 40, 5))
         
         # 2. Rotating Barrel
         barrel_length = 25
         end_x = tx + math.cos(angle) * barrel_length
         end_y = ty + math.sin(angle) * barrel_length
-        pygame.draw.line(screen, GREEN, (tx, ty), (end_x, end_y), 6) # Thick barrel
+        pygame.draw.line(screen, active_theme.color, (tx, ty), (end_x, end_y), 6) # Thick barrel
         
         # 3. Dome (drawn on top of the barrel to hide the joint)
-        pygame.draw.circle(screen, GREEN, (tx, ty), 15)
+        pygame.draw.circle(screen, active_theme.color, (tx, ty), 15)
         # Cut off the bottom half of the circle so it sits flat
         pygame.draw.rect(screen, BLACK, (tx - 15, ty, 30, 15)) 
-        pygame.draw.line(screen, GREEN, (tx - 15, ty), (tx + 15, ty), 2)
+        pygame.draw.line(screen, active_theme.color, (tx - 15, ty), (tx + 15, ty), 2)
 
     def draw(self, screen):
         screen.fill(BLACK)
-        pygame.draw.rect(screen, GREEN, (20, 20, WIDTH - 40, HEIGHT - 40), 2)
+        pygame.draw.rect(screen, active_theme.color, (20, 20, WIDTH - 40, HEIGHT - 40), 2)
         
         self.draw_turret(screen)
         
@@ -241,8 +242,8 @@ class AtomicCommand:
                 screen.blit(rotated_img, img_rect.topleft)
             else:
                 # FALLBACK: Draw a cool downward pointing dart
-                pygame.draw.line(screen, GREEN, (em["x"], em["y"]), (current_x, current_y), 1)
-                pygame.draw.polygon(screen, GREEN, [
+                pygame.draw.line(screen, active_theme.color, (em["x"], em["y"]), (current_x, current_y), 1)
+                pygame.draw.polygon(screen, active_theme.color, [
                     (current_x, current_y + 4), 
                     (current_x - 3, current_y - 3), 
                     (current_x + 3, current_y - 3)
@@ -251,38 +252,38 @@ class AtomicCommand:
         for laser in self.lasers:
             current_x = laser["start_x"] + (laser["target_x"] - laser["start_x"]) * laser["progress"]
             current_y = laser["start_y"] + (laser["target_y"] - laser["start_y"]) * laser["progress"]
-            pygame.draw.line(screen, GREEN, (laser["start_x"], laser["start_y"]), (current_x, current_y), 3)
+            pygame.draw.line(screen, active_theme.color, (laser["start_x"], laser["start_y"]), (current_x, current_y), 3)
 
         for exp in self.explosions:
-            pygame.draw.circle(screen, GREEN, (int(exp["x"]), int(exp["y"])), int(exp["radius"]))
+            pygame.draw.circle(screen, active_theme.color, (int(exp["x"]), int(exp["y"])), int(exp["radius"]))
 
         # Crosshair
-        pygame.draw.rect(screen, GREEN, (self.cross_x - 1, self.cross_y - 1, 2, 2))
-        pygame.draw.circle(screen, GREEN, (self.cross_x, self.cross_y), 8, 1)
-        pygame.draw.line(screen, GREEN, (self.cross_x, self.cross_y - 8), (self.cross_x, self.cross_y - 16), 1) 
-        pygame.draw.line(screen, GREEN, (self.cross_x, self.cross_y + 8), (self.cross_x, self.cross_y + 16), 1) 
-        pygame.draw.line(screen, GREEN, (self.cross_x - 8, self.cross_y), (self.cross_x - 16, self.cross_y), 1) 
-        pygame.draw.line(screen, GREEN, (self.cross_x + 8, self.cross_y), (self.cross_x + 16, self.cross_y), 1) 
+        pygame.draw.rect(screen, active_theme.color, (self.cross_x - 1, self.cross_y - 1, 2, 2))
+        pygame.draw.circle(screen, active_theme.color, (self.cross_x, self.cross_y), 8, 1)
+        pygame.draw.line(screen, active_theme.color, (self.cross_x, self.cross_y - 8), (self.cross_x, self.cross_y - 16), 1) 
+        pygame.draw.line(screen, active_theme.color, (self.cross_x, self.cross_y + 8), (self.cross_x, self.cross_y + 16), 1) 
+        pygame.draw.line(screen, active_theme.color, (self.cross_x - 8, self.cross_y), (self.cross_x - 16, self.cross_y), 1) 
+        pygame.draw.line(screen, active_theme.color, (self.cross_x + 8, self.cross_y), (self.cross_x + 16, self.cross_y), 1) 
 
         # UI Text
-        score_surf = self.small_font.render(f"SCORE {self.score}", True, GREEN)
+        score_surf = self.small_font.render(f"SCORE {self.score}", True, active_theme.color)
         screen.blit(score_surf, (WIDTH - 150, 30))
         
-        level_surf = self.small_font.render(f"WAVE {self.level}", True, GREEN)
+        level_surf = self.small_font.render(f"WAVE {self.level}", True, active_theme.color)
         screen.blit(level_surf, (WIDTH // 2 - level_surf.get_width() // 2, 30))
         
-        prompt_surf = self.small_font.render("TAB TO EJECT", True, GREEN)
+        prompt_surf = self.small_font.render("TAB TO EJECT", True, active_theme.color)
         screen.blit(prompt_surf, (30, 30))
 
         # --- DRAW STATE OVERLAYS ---
         if self.state == "GAME_OVER":
-            go_surf = self.large_font.render("GAME OVER", True, GREEN, BLACK)
+            go_surf = self.large_font.render("GAME OVER", True, active_theme.color, BLACK)
             screen.blit(go_surf, (WIDTH // 2 - go_surf.get_width() // 2, HEIGHT // 3))
-            sub_surf = self.small_font.render("PRESS SPACE TO RESTART", True, GREEN, BLACK)
+            sub_surf = self.small_font.render("PRESS SPACE TO RESTART", True, active_theme.color, BLACK)
             screen.blit(sub_surf, (WIDTH // 2 - sub_surf.get_width() // 2, HEIGHT // 3 + 60))
 
         elif self.state == "LEVEL_CLEAR":
-            lc_surf = self.large_font.render(f"WAVE {self.level} CLEARED", True, GREEN, BLACK)
+            lc_surf = self.large_font.render(f"WAVE {self.level} CLEARED", True, active_theme.color, BLACK)
             screen.blit(lc_surf, (WIDTH // 2 - lc_surf.get_width() // 2, HEIGHT // 3))
-            bonus_surf = self.small_font.render(f"INCOMING WAVE {self.level + 1}...", True, GREEN, BLACK)
+            bonus_surf = self.small_font.render(f"INCOMING WAVE {self.level + 1}...", True, active_theme.color, BLACK)
             screen.blit(bonus_surf, (WIDTH // 2 - bonus_surf.get_width() // 2, HEIGHT // 3 + 60))

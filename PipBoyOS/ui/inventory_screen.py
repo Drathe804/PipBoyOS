@@ -2,8 +2,9 @@
 import pygame
 import json
 import os
-from config import GREEN, BLACK, WIDTH, HEIGHT
+from config import BLACK, WIDTH, HEIGHT
 from system.animation import TabAnimator
+from system.theme import active_theme
 
 inv_animator = TabAnimator()
 
@@ -26,10 +27,10 @@ def get_selected_inventory_item(sub_active_inv, item_index):
     return items[safe_index]
 
 # --- 2. THE IMAGE TINTING HELPER ---
-# Forces any icon to match your radioactive green UI color!
+# Forces any icon to match your radioactive active_theme.color UI color!
 def tint_image(image, color):
     tinted = image.copy()
-    # BLEND_RGB_MULT multiplies the colors. White/greyscale pixels become green!
+    # BLEND_RGB_MULT multiplies the colors. White/greyscale pixels become active_theme.color!
     tinted.fill(color, special_flags=pygame.BLEND_RGB_MULT)
     return tinted
 
@@ -54,7 +55,7 @@ def draw_highlighted_stat_row(screen, font, label, value, x, y, width, trans_sur
     label: Left-aligned text (e.g., "Damage")
     value: Right-aligned text (e.g., "50 ++")
     width: Total width of the info column
-    trans_surf: A reusable transparent green surface for the highlight effect
+    trans_surf: A reusable transparent active_theme.color surface for the highlight effect
     """
     
     # 1. POSITION THE ROW HIGHLIGHT (BEHIND THE TEXT)
@@ -68,14 +69,14 @@ def draw_highlighted_stat_row(screen, font, label, value, x, y, width, trans_sur
     # Blit the transparent highlight FIRST (the background glow)
     screen.blit(trans_surf, acc_rect.topleft, pygame.Rect(0, 0, width, acc_rect.height))
 
-    # 2. DRAW THE TINTED GREEN TEXT (ON TOP OF HIGHLIGHT)
+    # 2. DRAW THE TINTED active_theme.color TEXT (ON TOP OF HIGHLIGHT)
     
     # Left-align the label
-    label_surf = font.render(label, True, GREEN)
+    label_surf = font.render(label, True, active_theme.color)
     screen.blit(label_surf, (x + 4, y)) # slight padding from left edge
 
     # Right-align the value
-    val_surf = font.render(str(value), True, GREEN)
+    val_surf = font.render(str(value), True, active_theme.color)
     val_width = val_surf.get_width()
     screen.blit(val_surf, (x + width - val_width - 4, y)) # slight padding from right edge
 
@@ -83,7 +84,7 @@ def draw_highlighted_stat_row(screen, font, label, value, x, y, width, trans_sur
 # --- HELPER: DRAW BOTTOM FOOTER ICON STATS (NO CHANGE) ---
 def draw_footer_stat(screen, font, label, value, x, y):
     full_text = f"{label} {value}"
-    stat_surf = font.render(full_text, True, GREEN)
+    stat_surf = font.render(full_text, True, active_theme.color)
     screen.blit(stat_surf, (x, y))
 
 
@@ -106,13 +107,13 @@ def draw_inventory_tab(screen, font, sub_tabs_inv, sub_active_inv, item_index):
     items = inventory_data.get(current_category, [])
 
     if not items:
-        empty_text = font.render("NO ITEMS FOUND", True, GREEN)
+        empty_text = font.render("NO ITEMS FOUND", True, active_theme.color)
         screen.blit(empty_text, (20, 80))
         return
 
     safe_index = max(0, min(item_index, len(items) - 1))
 
-    # --- DRAW THE ITEM LIST (NO CHANGE, still all GREEN) ---
+    # --- DRAW THE ITEM LIST (NO CHANGE, still all active_theme.color) ---
     list_start_y = 80
     for i, item in enumerate(items):
         item_name = item.get("name", "Unknown Item")
@@ -120,10 +121,10 @@ def draw_inventory_tab(screen, font, sub_tabs_inv, sub_active_inv, item_index):
             text_surface = font.render(item_name, True, BLACK)
             rect = text_surface.get_rect(topleft=(20, list_start_y))
             rect.inflate_ip(10, 4)
-            pygame.draw.rect(screen, GREEN, rect)
+            pygame.draw.rect(screen, active_theme.color, rect)
             screen.blit(text_surface, (25, list_start_y + 2))
         else:
-            text_surface = font.render(item_name, True, GREEN)
+            text_surface = font.render(item_name, True, active_theme.color)
             screen.blit(text_surface, (25, list_start_y + 2))
         list_start_y += 25
 
@@ -153,8 +154,8 @@ def draw_inventory_tab(screen, font, sub_tabs_inv, sub_active_inv, item_index):
 
     if image_to_draw:
         # User requested image itself same color as UI? TINT IT BEFORE BLITTING!
-        # Forces white icons or full-color images to match the phosphor green.
-        tinted_image = tint_image(image_to_draw, GREEN)
+        # Forces white icons or full-color images to match the phosphor active_theme.color.
+        tinted_image = tint_image(image_to_draw, active_theme.color)
         img_rect = tinted_image.get_rect(center=info_rect.center)
         screen.blit(tinted_image, img_rect.topleft)
 
@@ -165,8 +166,8 @@ def draw_inventory_tab(screen, font, sub_tabs_inv, sub_active_inv, item_index):
     trans_alpha = 40 # Subtle glow (out of 255)
     row_height = font.get_height() + 2 # Add padding
     trans_surf = pygame.Surface((column_width, row_height), pygame.SRCALPHA)
-    # Fill with the radioactive green at low opacity
-    trans_surf.fill((GREEN[0], GREEN[1], GREEN[2], trans_alpha))
+    # Fill with the radioactive active_theme.color at low opacity
+    trans_surf.fill((active_theme.color[0], active_theme.color[1], active_theme.color[2], trans_alpha))
 
     # ==========================================
     # 3. DRAW DYNAMIC STATS WITH ROW HIGHLIGHTS
@@ -207,6 +208,6 @@ def draw_inventory_tab(screen, font, sub_tabs_inv, sub_active_inv, item_index):
     # 5. THE HOLOTAPE PROMPT
     # ==========================================
     if "game" in selected_item:
-        prompt_surf = font.render("LOAD HOLOTAPE", True, BLACK, GREEN) # Black text on Green box
+        prompt_surf = font.render("LOAD HOLOTAPE", True, BLACK, active_theme.color) # Black text on active_theme.color box
         # Draw it neatly aligned on the right side above the stats
         screen.blit(prompt_surf, (info_column_x, stat_start_y)) 

@@ -1,7 +1,8 @@
 # ui/stat_screen.py
 import pygame
-from config import GREEN, BLACK, WIDTH, HEIGHT
+from config import BLACK, WIDTH, HEIGHT
 from system.animation import TabAnimator # Import our new tool!
+from system.theme import active_theme
 
 # Create an animator specifically for the inventory screen
 inv_animator = TabAnimator()
@@ -50,11 +51,11 @@ def draw_stat_tab(screen, font, sub_tabs_stat, sub_active_stat, walk_anim, curre
         start_y = 80
         for i, (stat, val) in enumerate(special_stats):
             # Left align the word
-            stat_text = font.render(stat, True, GREEN)
+            stat_text = font.render(stat, True, active_theme.color)
             screen.blit(stat_text, (30, start_y + (i * 22)))
             
             # Right align the number to a specific column
-            val_text = font.render(str(val), True, GREEN)
+            val_text = font.render(str(val), True, active_theme.color)
             screen.blit(val_text, (180, start_y + (i * 22)))
 
     # --- PERKS TAB (Left List, Right Vault Boy) ---
@@ -73,5 +74,5 @@ def draw_stat_tab(screen, font, sub_tabs_stat, sub_active_stat, walk_anim, curre
         
         start_y = 80
         for i, perk in enumerate(perks):
-            perk_text = font.render(f"> {perk}", True, GREEN)
+            perk_text = font.render(f"> {perk}", True, active_theme.color)
             screen.blit(perk_text, (30, start_y + (i * 25)))

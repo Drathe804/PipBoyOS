@@ -2,7 +2,8 @@
 import pygame
 import math
 import random
-from config import GREEN, BLACK, WIDTH, HEIGHT
+from config import BLACK, WIDTH, HEIGHT
+from system.theme import active_theme
 
 class RedMenace:
     def __init__(self):
@@ -167,8 +168,8 @@ class RedMenace:
 
     def draw_girder(self, screen, x1, y1, x2, y2):
         thickness = 8
-        pygame.draw.line(screen, GREEN, (x1, y1), (x2, y2), 2)
-        pygame.draw.line(screen, GREEN, (x1, y1 + thickness), (x2, y2 + thickness), 2)
+        pygame.draw.line(screen, active_theme.color, (x1, y1), (x2, y2), 2)
+        pygame.draw.line(screen, active_theme.color, (x1, y1 + thickness), (x2, y2 + thickness), 2)
         
         dist = math.hypot(x2 - x1, y2 - y1)
         steps = int(dist // 12) 
@@ -181,18 +182,18 @@ class RedMenace:
                 next_x = x1 + (i + 1) * dx
                 next_y = y1 + (i + 1) * dy
                 
-                pygame.draw.line(screen, GREEN, (curr_x, curr_y), (next_x, next_y + thickness), 1)
-                pygame.draw.line(screen, GREEN, (curr_x, curr_y + thickness), (next_x, next_y), 1)
+                pygame.draw.line(screen, active_theme.color, (curr_x, curr_y), (next_x, next_y + thickness), 1)
+                pygame.draw.line(screen, active_theme.color, (curr_x, curr_y + thickness), (next_x, next_y), 1)
 
     def draw_ladder(self, screen, rect):
-        pygame.draw.line(screen, GREEN, (rect.left, rect.top), (rect.left, rect.bottom), 2)
-        pygame.draw.line(screen, GREEN, (rect.right, rect.top), (rect.right, rect.bottom), 2)
+        pygame.draw.line(screen, active_theme.color, (rect.left, rect.top), (rect.left, rect.bottom), 2)
+        pygame.draw.line(screen, active_theme.color, (rect.right, rect.top), (rect.right, rect.bottom), 2)
         for y in range(int(rect.top) + 5, int(rect.bottom), 12):
-            pygame.draw.line(screen, GREEN, (rect.left, y), (rect.right, y), 2)
+            pygame.draw.line(screen, active_theme.color, (rect.left, y), (rect.right, y), 2)
 
     def draw(self, screen):
         screen.fill(BLACK)
-        pygame.draw.rect(screen, GREEN, (20, 20, WIDTH - 40, HEIGHT - 40), 2)
+        pygame.draw.rect(screen, active_theme.color, (20, 20, WIDTH - 40, HEIGHT - 40), 2)
 
         for ladder in self.ladders:
             self.draw_ladder(screen, ladder)
@@ -200,28 +201,28 @@ class RedMenace:
         for plat in self.platforms:
             self.draw_girder(screen, plat["x1"], plat["y1"], plat["x2"], plat["y2"])
 
-        pygame.draw.rect(screen, GREEN, self.goal_rect)
-        pygame.draw.circle(screen, GREEN, (self.goal_rect.centerx, self.goal_rect.top - 4), 6)
+        pygame.draw.rect(screen, active_theme.color, self.goal_rect)
+        pygame.draw.circle(screen, active_theme.color, (self.goal_rect.centerx, self.goal_rect.top - 4), 6)
 
-        pygame.draw.rect(screen, GREEN, self.boss_rect)
+        pygame.draw.rect(screen, active_theme.color, self.boss_rect)
         pygame.draw.rect(screen, BLACK, (self.boss_rect.x + 4, self.boss_rect.y + 6, 4, 4))
         pygame.draw.rect(screen, BLACK, (self.boss_rect.x + 14, self.boss_rect.y + 6, 4, 4))
 
-        pygame.draw.rect(screen, GREEN, self.player_rect)
+        pygame.draw.rect(screen, active_theme.color, self.player_rect)
 
         for bomb in self.bombs:
-            pygame.draw.circle(screen, GREEN, bomb["rect"].center, bomb["rect"].width // 2)
+            pygame.draw.circle(screen, active_theme.color, bomb["rect"].center, bomb["rect"].width // 2)
 
-        score_surf = self.small_font.render(f"SCORE {self.score}", True, GREEN)
+        score_surf = self.small_font.render(f"SCORE {self.score}", True, active_theme.color)
         screen.blit(score_surf, (WIDTH - 150, 30))
 
-        prompt_surf = self.small_font.render("TAB TO EJECT", True, GREEN)
+        prompt_surf = self.small_font.render("TAB TO EJECT", True, active_theme.color)
         screen.blit(prompt_surf, (30, 30))
 
         if self.state == "GAME_OVER":
-            go_surf = self.large_font.render("YOU DIED", True, GREEN, BLACK)
+            go_surf = self.large_font.render("YOU DIED", True, active_theme.color, BLACK)
             screen.blit(go_surf, (WIDTH // 2 - go_surf.get_width() // 2, HEIGHT // 3))
 
         elif self.state == "LEVEL_CLEAR":
-            lc_surf = self.large_font.render("MENACE DEFEATED!", True, GREEN, BLACK)
+            lc_surf = self.large_font.render("MENACE DEFEATED!", True, active_theme.color, BLACK)
             screen.blit(lc_surf, (WIDTH // 2 - lc_surf.get_width() // 2, HEIGHT // 3))
