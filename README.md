@@ -10,7 +10,7 @@ A Fallout-inspired wearable operating system built with Python and Raspberry Pi,
 
 <p align="center">
   <video width="700" controls muted>
-    <source src="./assets/demo/pipboy_demo.mp4" type="video/mp4">
+    <source src="./PipBoyOS/assets/demo/pipboy_demo.mp4" type="video/mp4">
   </video>
 </p>
 
@@ -76,44 +76,32 @@ Originally created for cosplay and conventions, it has evolved into a full softw
 
 ### 🖥️ Core Interface
 <p align="center">
-  <img src="./assets/images/pipboy_inventory_holotapes.png" width="700"/>
-  <img src="./assets/images/pipboy_special_stats.png" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_inventory.jpg" width="700"/>
 </p>
-
----
 
 ### 🎨 Dynamic Themes
 <p align="center">
-  <img src="./assets/images/pipboy_theme_default.png" width="700"/>
-  <img src="./assets/images/pipboy_theme_barbie_active.png" width="700"/>
-  <img src="./assets/images/pipboy_theme_custom.png" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_active_barbie_theme.jpg" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_custom_theme_gold.jpg" width="700"/>
 </p>
-
----
 
 ### 📡 Radio System
 <p align="center">
-  <img src="./assets/images/pipboy_radio_tx.png" width="700"/>
-  <img src="./assets/images/pipboy_radio_rx.png" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_radio_tx.jpg" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_radio_rx.jpg" width="700"/>
 </p>
-
----
 
 ### 🎮 Mini-Games
 <p align="center">
-  <img src="./assets/images/pipboy_atomic_command_action.png" width="700"/>
-  <img src="./assets/images/pipboy_atomic_command_wave.png" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_atomic_command.jpg" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_atomic_command_wave_complete.jpg" width="700"/>
 </p>
-
----
 
 ### 🗺️ Mapping System
 <p align="center">
-  <img src="./assets/images/pipboy_map_zoomed_out.png" width="700"/>
-  <img src="./assets/images/pipboy_map_zoomed_in.png" width="700"/>
-  <img src="./assets/images/pipboy_map_cursor.png" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_zoomed_out_map_with_markers.jpg" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_zoomed_in_map_with_markers.jpg" width="700"/>
 </p>
-
 ---
 
 ## 🛠️ Tech Stack
