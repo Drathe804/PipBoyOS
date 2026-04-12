@@ -8,11 +8,7 @@ A Fallout-inspired wearable operating system built with Python and Raspberry Pi,
 
 > ⚡ 23-second demo showcasing UI navigation, dynamic themes, radio TX/RX, mapping, and integrated mini-games
 
-<p align="center">
-  <video width="700" controls muted>
-    <source src="./PipBoyOS/assets/demo/pipboy_demo.mp4" type="video/mp4">
-  </video>
-</p>
+[▶️ Watch Demo Video](https://github.com/Drathe804/PipBoyOS/releases/tag/Pip-Boy_OS_Demo)
 
 ---
 
