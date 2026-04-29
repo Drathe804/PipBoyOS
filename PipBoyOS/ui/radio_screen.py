@@ -63,12 +63,7 @@ def draw_radio_tab(screen, font, sub_tabs_radio, sub_active_radio, current_time,
     # ==========================================
     # PUSH-TO-TALK LOGIC
     # ==========================================
-    is_transmitting = False
     if sub_active_radio == 2:
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            is_transmitting = True
-            
         if is_transmitting:
             status_surf = font.render(" STATUS: [ TX ] TRANSMITTING ", True, BLACK, active_theme.color)
         else:

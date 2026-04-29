@@ -17,6 +17,39 @@ from system.hardware_controls import PipBoyHardware
 from system.theme import active_theme
 from ui.settings_screen import draw_settings_tab
 
+# --- SMART HARDWARE SETUP ---
+try:
+    import RPi.GPIO as GPIO
+    print("Raspberry Pi Hardware Detected. GPIO Active.")
+except ImportError:
+    print("Laptop Detected. Loading Dummy GPIO.")
+    # Create a fake GPIO class so the laptop doesn't crash
+    class DummyGPIO:
+        BOARD = "BOARD"
+        OUT = "OUT"
+        HIGH = "HIGH"
+        LOW = "LOW"
+        def setmode(self, mode): pass
+        def setup(self, pin, mode): pass
+        def output(self, pin, state): pass
+        def cleanup(self): pass
+    GPIO = DummyGPIO()
+
+# --- RADIO HARDWARE SETUP ---
+PTT_PIN = 11  # Physical Pin 11 (Orange wire - Push to Talk)
+PD_PIN = 13   # Physical Pin 13 (Purple wire - Power Down / Sleep)
+
+GPIO.setmode(GPIO.BOARD) # Use physical pin numbers
+
+# Setup Push-To-Talk
+GPIO.setup(PTT_PIN, GPIO.OUT)
+GPIO.output(PTT_PIN, GPIO.HIGH) # HIGH means "Listen Mode"
+
+# Setup Sleep Mode
+GPIO.setup(PD_PIN, GPIO.OUT)
+GPIO.output(PD_PIN, GPIO.LOW) # LOW means "Deep Sleep" on boot!
+
+
 # --- 1. SETUP ---
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -83,7 +116,8 @@ while running:
             elif event.key == pygame.K_t:
                 radio_press_time = pygame.time.get_ticks()
                 if radio_power_on:
-                    is_transmitting = True 
+                    is_transmitting = True
+                    GPIO.output(PTT_PIN, GPIO.LOW)
             
             elif current_state == "MAIN_MENU": 
                 if event.key in (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN):
@@ -210,11 +244,25 @@ while running:
                         boot_manager.__init__() 
                         current_state = "BOOTING"
 
-            elif event.key == pygame.K_t:
+            elif event.key in (pygame.K_t, pygame.K_SPACE):
                 is_transmitting = False 
+                GPIO.output(PTT_PIN, GPIO.HIGH) # Stop transmitting
+                
+                # Calculate how long the button was held
                 radio_duration = pygame.time.get_ticks() - radio_press_time
+                
+                # If it was a quick tap (< 500ms), toggle the power!
                 if radio_duration < 500: 
                     radio_power_on = not radio_power_on
+                    
+                    # --- HARDWARE DEEP SLEEP LOGIC ---
+                    if radio_power_on:
+                        GPIO.output(PD_PIN, GPIO.HIGH) # Wake up the SA818!
+                        print("Radio Status: AWAKE")
+                    else:
+                        GPIO.output(PD_PIN, GPIO.LOW)  # Put SA818 to sleep!
+                        print("Radio Status: ASLEEP")
+
 
 
     screen.fill(BLACK) 
@@ -280,6 +328,15 @@ while running:
         screen.fill(BLACK)
 
     # --- 4. POST-PROCESSING ---
+
+    # --- GLOBAL TRANSMITTING ICON ---
+    # If transmitting, but we are NOT on the radio tab (active_tab != 4)
+    if is_transmitting and active_tab != 4:
+        tx_rect = pygame.Rect(WIDTH - 120, HEIGHT - 40, 100, 25)
+        pygame.draw.rect(screen, active_theme.color, tx_rect)
+        tx_text = font.render("[ TX ]", True, BLACK)
+        screen.blit(tx_text, (tx_rect.x + 30, tx_rect.y + 4))
+
     if glitch_timer > 0:
         if roll_speed != 0:
             roll_y = (glitch_timer * roll_speed) % HEIGHT
@@ -312,5 +369,6 @@ while running:
     pygame.display.flip()
     pygame.time.Clock().tick(60) 
 
+GPIO.cleanup()
 pygame.quit()
 sys.exit()
