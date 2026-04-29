@@ -8,11 +8,7 @@ A Fallout-inspired wearable operating system built with Python and Raspberry Pi,
 
 > ⚡ 23-second demo showcasing UI navigation, dynamic themes, radio TX/RX, mapping, and integrated mini-games
 
-<p align="center">
-  <video width="700" controls muted>
-    <source src="./assets/demo/pipboy_demo.mp4" type="video/mp4">
-  </video>
-</p>
+[![Watch Demo](./PipBoyOS/assets/demo/pipboy_boot_success.jpg)](https://github.com/Drathe804/PipBoyOS/releases/download/Pip-Boy_OS_Demo/pipboy_demo.mp4)
 
 ---
 
@@ -21,12 +17,13 @@ A Fallout-inspired wearable operating system built with Python and Raspberry Pi,
 Pip-Boy OS is a custom-built interactive system inspired by the Pip-Boy from Fallout.
 
 The goal was not just to recreate the look of the UI, but to build something that behaves like a real device:
-- modular systems
-- dynamic UI
-- interactive elements
-- expandable hardware integration
 
-Originally created for cosplay and conventions, it has evolved into a full software + hardware concept.
+- Modular systems  
+- Dynamic UI  
+- Interactive elements  
+- Expandable hardware integration  
+
+Originally created for cosplay and conventions, it has evolved into a full **software + hardware system**.
 
 ---
 
@@ -34,15 +31,15 @@ Originally created for cosplay and conventions, it has evolved into a full softw
 
 ### 🎨 Dynamic Theme System
 - Full-screen real-time RGB theming (inspired by Fallout 4)
-- Preset themes (default green, Barbie theme)
-- Entire UI updates consistently across all systems (including games)
+- Preset themes (default green, Barbie theme, custom themes)
+- Entire UI updates consistently across all systems, including mini-games
 
 ### 📡 Radio System
 - Station selection interface
 - TX / RX state switching
 - Waveform visualization
 - Frequency display
-- Designed for future real-world communication integration
+- Designed for real-world radio module integration (SA818-U)
 
 ### 🗺️ Mapping System
 - Coordinate-based map rendering
@@ -51,24 +48,47 @@ Originally created for cosplay and conventions, it has evolved into a full softw
 - Edge-aware marker display
 
 ### 🎮 Mini-Games (Holotapes)
-- Atomic Command (playable)
+- Atomic Command (fully playable)
 - Red Menace (in progress)
-- Holotape-based game system for future NFC integration
+- Holotape-based system designed for future NFC integration
 
 ### 🎒 Inventory System
 - Categorized item lists
 - Holotape selection interface
-- Context panels and actions
+- Context panels and navigation
 
 ### 🧠 STAT System
-- SPECIAL stats display
-- Perk framework
-- Fallout-style layout and presentation
+- SPECIAL stat display
+- Perk system framework
+- Fallout-style layout and UI behavior
 
 ### ⚙️ Boot System
 - RobCo-style startup sequence
-- CRT-style UI behavior
-- Immersive system loading
+- CRT-inspired transitions and effects
+- Simulated system initialization
+
+---
+
+## 🧰 Hardware Status
+
+### ✅ Currently Implemented
+- Raspberry Pi deployment
+- Connected display
+- 4 rotary encoders fully functional:
+  - Navigation
+  - Selection
+  - Cursor movement
+  - Dedicated radio control input
+
+### 🔧 In Progress
+- Microcontroller integration
+- Fullscreen auto-boot behavior
+- SA818-U radio module integration
+
+### 🔮 Planned
+- NFC holotapes (physical media interaction)
+- Fully wearable Pip-Boy casing
+- Expanded hardware controls
 
 ---
 
@@ -76,62 +96,59 @@ Originally created for cosplay and conventions, it has evolved into a full softw
 
 ### 🖥️ Core Interface
 <p align="center">
-  <img src="./assets/images/pipboy_inventory_holotapes.png" width="700"/>
-  <img src="./assets/images/pipboy_special_stats.png" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_inventory.jpg" width="700"/>
 </p>
 
 ---
 
 ### 🎨 Dynamic Themes
 <p align="center">
-  <img src="./assets/images/pipboy_theme_default.png" width="700"/>
-  <img src="./assets/images/pipboy_theme_barbie_active.png" width="700"/>
-  <img src="./assets/images/pipboy_theme_custom.png" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_active_barbie_theme.jpg" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_custom_theme_gold.jpg" width="700"/>
 </p>
 
 ---
 
 ### 📡 Radio System
 <p align="center">
-  <img src="./assets/images/pipboy_radio_tx.png" width="700"/>
-  <img src="./assets/images/pipboy_radio_rx.png" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_radio_tx.jpg" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_radio_rx.jpg" width="700"/>
 </p>
 
 ---
 
 ### 🎮 Mini-Games
 <p align="center">
-  <img src="./assets/images/pipboy_atomic_command_action.png" width="700"/>
-  <img src="./assets/images/pipboy_atomic_command_wave.png" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_atomic_command.jpg" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_atomic_command_wave_complete.jpg" width="700"/>
 </p>
 
 ---
 
 ### 🗺️ Mapping System
 <p align="center">
-  <img src="./assets/images/pipboy_map_zoomed_out.png" width="700"/>
-  <img src="./assets/images/pipboy_map_zoomed_in.png" width="700"/>
-  <img src="./assets/images/pipboy_map_cursor.png" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_zoomed_out_map_with_markers.jpg" width="700"/>
+  <img src="./PipBoyOS/assets/demo/pipboy_zoomed_in_map_with_markers.jpg" width="700"/>
 </p>
 
 ---
 
 ## 🛠️ Tech Stack
 
-- Python
-- Pygame
-- Raspberry Pi (target hardware)
-- JSON for data/configuration
-- Planned: Arduino / microcontrollers, NFC
+- Python  
+- Pygame  
+- Raspberry Pi  
+- JSON (data/configuration)  
+- Planned: Arduino / microcontrollers, NFC  
 
 ---
 
 ## 🧠 Design Philosophy
 
-- **Immersion first** — UI behaves like a real Pip-Boy
-- **System over screens** — everything is connected, not isolated
-- **Expandable architecture** — built to grow with hardware and features
-- **Fun + functional** — gamifying real-world interactions
+- **Immersion first** — UI behaves like a real Pip-Boy  
+- **System over screens** — everything is interconnected  
+- **Expandable architecture** — built to evolve with hardware  
+- **Fun + functional** — blending real-world utility with game design  
 
 ---
 
@@ -139,20 +156,19 @@ Originally created for cosplay and conventions, it has evolved into a full softw
 
 - Maintaining consistent UI across dynamic theme changes  
 - Handling coordinate-based map rendering with persistent markers  
-- Designing a believable OS-style interface instead of static screens  
+- Designing a system-driven UI instead of static screens  
 - Simulating radio transmission states visually  
-- Integrating games into a cohesive system instead of standalone apps  
+- Integrating mini-games into a unified OS  
 
 ---
 
 ## 🔮 Future Plans
 
-- NFC holotapes (physical game/media loading)
-- Wearable Pip-Boy casing
-- Rotary encoder / hardware controls
-- Real radio communication modules
-- Health/stat integration via smartwatch APIs
-- Expanded quest/log systems
+- NFC holotapes for physical game/media interaction  
+- Fully wearable Pip-Boy casing  
+- Real radio communication via SA818-U  
+- Smartwatch integration (health, stats, tracking)  
+- Quest system expansion  
 
 ---
 
