@@ -1,6 +1,7 @@
 # PipBoyOS.py
 import pygame
 import sys
+import os
 import random
 from config import *
 from crt import CRTFilter
@@ -13,17 +14,21 @@ from ui.data_screen import draw_data_tab
 from ui.map_screen import draw_map_tab
 from ui.radio_screen import draw_radio_tab
 from ui.map_screen import draw_map_tab, reset_map_cursor
-from system.hardware_controls import PipBoyHardware
 from system.theme import active_theme
 from ui.settings_screen import draw_settings_tab
 
 # --- SMART HARDWARE SETUP ---
 try:
     import RPi.GPIO as GPIO
-    print("Raspberry Pi Hardware Detected. GPIO Active.")
+    import serial
+    print("Raspberry Pi Hardware Detected. GPIO & Serial Active.")
+    
+    # Open the real physical data wires (Pins 8 & 10)
+    radio_serial = serial.Serial('/dev/serial0', baudrate=9600, timeout=1)
+    
 except ImportError:
-    print("Laptop Detected. Loading Dummy GPIO.")
-    # Create a fake GPIO class so the laptop doesn't crash
+    print("Laptop Detected. Loading Dummy Hardware.")
+    
     class DummyGPIO:
         BOARD = "BOARD"
         OUT = "OUT"
@@ -34,6 +39,13 @@ except ImportError:
         def output(self, pin, state): pass
         def cleanup(self): pass
     GPIO = DummyGPIO()
+
+    class DummySerial:
+        def write(self, data): 
+            print(f"[LAPTOP MOCK SERIAL] Sent: {data.decode('utf-8').strip()}")
+        def close(self): pass
+    radio_serial = DummySerial()
+
 
 # --- RADIO HARDWARE SETUP ---
 PTT_PIN = 11  # Physical Pin 11 (Orange wire - Push to Talk)
@@ -52,7 +64,7 @@ GPIO.output(PD_PIN, GPIO.LOW) # LOW means "Deep Sleep" on boot!
 
 # --- 1. SETUP ---
 pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 pygame.display.set_caption("Pip-Boy OS")
 
 font = pygame.font.Font("fallout.ttf", 14) 
@@ -60,8 +72,6 @@ large_font = pygame.font.Font("fallout.ttf", 48)
 
 crt_filter = CRTFilter()
 boot_manager = BootManager()
-
-hardware_listener = PipBoyHardware()
 
 walk_anim = SpriteAnimation("assets/idle-walking", frame_rate=100, scale=0.5) 
 
@@ -93,12 +103,37 @@ power_press_time = 0
 radio_press_time = 0 
 rgb_mode = False # NEW: Slider lock tracker
 
+# --- RADIO TUNING FUNCTION ---
+def tune_radio(freq_string):
+    # The SA818 chip ignores commands if it is asleep!
+    if not radio_power_on:
+        print("Cannot tune: Radio is powered OFF.")
+        return
+        
+    # Format: AT+DMOSETGROUP=Bandwidth, TX_Freq, RX_Freq, TX_CTCSS, RX_CTCSS, Squelch
+    command = f"AT+DMOSETGROUP=0,{freq_string},{freq_string},0000,0000,4\r\n"
+    
+    try:
+        radio_serial.write(command.encode('utf-8'))
+        print(f"Successfully tuned radio to {freq_string} MHz!")
+    except Exception as e:
+        print(f"Serial write error: {e}")
+
+
 # --- 2. MAIN LOOP ---
 while running:
     current_time = pygame.time.get_ticks()
     
     events = pygame.event.get()
     keys = pygame.key.get_pressed()
+
+    # --- NEW: HARDWARE SHUTDOWN CHECK ---
+    if keys[pygame.K_p] and power_press_time > 0:
+        if current_time - power_press_time > 3000:  # 3000 milliseconds = 3 seconds
+            print("Initiating Hardware Shutdown...")
+            os.system("sudo shutdown -h now")
+            power_press_time = current_time # Reset to prevent spamming the command
+    # ------------------------------------
 
     for event in events:
         if event.type == pygame.QUIT:
@@ -198,9 +233,22 @@ while running:
                                 current_state = "PLAYING_HOLOTAPE"
                                 
                     elif active_tab == 4 and sub_active_radio == 2: 
-                        transceiver_items = 3 + len(saved_channels) 
-                        if (item_index % transceiver_items) == (transceiver_items - 1):
+                        # Figure out exactly what item we are hovering over
+                        radio_items = ["FRS Channel 1", "FRS Channel 2"] + saved_channels + ["MANUAL TUNE (VFO)"]
+                        hovered_item = radio_items[item_index % len(radio_items)]
+
+                        if hovered_item == "MANUAL TUNE (VFO)":
                             vfo_mode = not vfo_mode 
+                            # If we just TURNED OFF VFO mode, lock in the manual frequency!
+                            if not vfo_mode:
+                                tune_radio(f"{manual_freq:.4f}")
+                                
+                        elif hovered_item == "FRS Channel 1":
+                            tune_radio("462.5625")
+                            
+                        elif hovered_item == "FRS Channel 2":
+                            tune_radio("462.5875")
+
 
                     # NEW: Theme & RGB Selector for the DATA Tab!
                     elif active_tab == 2 and sub_active_data == 3: 
