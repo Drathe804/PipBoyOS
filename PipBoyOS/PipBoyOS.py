@@ -102,6 +102,7 @@ is_transmitting = False
 power_press_time = 0
 radio_press_time = 0 
 rgb_mode = False # NEW: Slider lock tracker
+active_station = ""
 
 # --- RADIO TUNING FUNCTION ---
 def tune_radio(freq_string):
@@ -232,23 +233,36 @@ while running:
                                 active_game = RedMenace()
                                 current_state = "PLAYING_HOLOTAPE"
                                 
-                    elif active_tab == 4 and sub_active_radio == 2: 
-                        # Figure out exactly what item we are hovering over
-                        radio_items = ["FRS Channel 1", "FRS Channel 2"] + saved_channels + ["MANUAL TUNE (VFO)"]
+                    # --- UPGRADED RADIO LOGIC ---
+                    elif active_tab == 4: 
+                        # 1. Figure out which list of stations we are looking at
+                        if sub_active_radio == 0:
+                            radio_items = ["Galaxy News Radio", "Diamond City Radio", "Here Come The Mummies", "Sedalia Local 92.3"]
+                        elif sub_active_radio == 1:
+                            radio_items = ["Wasteland Survival Guide", "Swole Scroll Devlog"]
+                        elif sub_active_radio == 2:
+                            radio_items = ["FRS Channel 1", "FRS Channel 2"] + saved_channels + ["MANUAL TUNE (VFO)"]
+
+                        # 2. Grab the exact name of the station hovered over
                         hovered_item = radio_items[item_index % len(radio_items)]
 
-                        if hovered_item == "MANUAL TUNE (VFO)":
-                            vfo_mode = not vfo_mode 
-                            # If we just TURNED OFF VFO mode, lock in the manual frequency!
-                            if not vfo_mode:
-                                tune_radio(f"{manual_freq:.4f}")
-                                
-                        elif hovered_item == "FRS Channel 1":
-                            tune_radio("462.5625")
-                            
-                        elif hovered_item == "FRS Channel 2":
-                            tune_radio("462.5875")
+                        # 3. LOCK IT IN! (This tells the UI which station to outline)
+                        active_station = hovered_item
 
+                        # 4. Handle actual hardware tuning if it's an FRS/VFO channel
+                        if sub_active_radio == 2:
+                            if hovered_item == "MANUAL TUNE (VFO)":
+                                vfo_mode = not vfo_mode 
+                                # If we just TURNED OFF VFO mode, lock in the manual frequency!
+                                if not vfo_mode:
+                                    tune_radio(f"{manual_freq:.4f}")
+                            elif hovered_item == "FRS Channel 1":
+                                tune_radio("462.5625")
+                            elif hovered_item == "FRS Channel 2":
+                                tune_radio("462.5875")
+                        else:
+                            # Safety check: If you tune to a normal station, force VFO mode off
+                            vfo_mode = False
 
                     # NEW: Theme & RGB Selector for the DATA Tab!
                     elif active_tab == 2 and sub_active_data == 3: 
@@ -264,6 +278,7 @@ while running:
                         else: 
                             # They clicked an RGB Slider!
                             rgb_mode = not rgb_mode
+
 
             elif current_state == "PLAYING_HOLOTAPE":
                 if event.key in (pygame.K_TAB, pygame.K_ESCAPE):
@@ -337,7 +352,13 @@ while running:
         elif active_tab == 3:
             draw_map_tab(screen, font, sub_tabs_map, sub_active_map, current_time, keys, events)
         elif active_tab == 4:
-            draw_radio_tab(screen, font, sub_tabs_radio, sub_active_radio, current_time, item_index, vfo_mode, manual_freq, saved_channels, radio_power_on, is_transmitting)
+            draw_radio_tab(
+                screen, font, sub_tabs_radio, sub_active_radio, 
+                current_time, item_index, vfo_mode, manual_freq, 
+                saved_channels, radio_power_on, is_transmitting, 
+                active_station_name = active_station # <--- ADD THIS
+            )
+
 
     elif current_state == "PLAYING_HOLOTAPE":
         screen.fill(BLACK)

@@ -34,7 +34,6 @@
     <Compile Include="system\api_keys.example.py" />
     <Compile Include="system\api_keys.py" />
     <Compile Include="system\boot.py" />
-    <Compile Include="system\hardware_controls.py" />
     <Compile Include="system\navigation.py" />
     <Compile Include="system\theme.py" />
     <Compile Include="system\__init__.py" />

@@ -23,7 +23,8 @@ RADIO_DATABASE = {
     "MANUAL TUNE (VFO)": {"freq": "CUSTOM", "amp": 8, "speed": 0.03, "style": "simple"}
 }
 
-def draw_radio_tab(screen, font, sub_tabs_radio, sub_active_radio, current_time, item_index, vfo_mode, manual_freq, saved_channels, radio_power_on, is_transmitting):
+# Pip-Boy UI Update: Added 'active_station_name' to the end of the parameters!
+def draw_radio_tab(screen, font, sub_tabs_radio, sub_active_radio, current_time, item_index, vfo_mode, manual_freq, saved_channels, radio_power_on, is_transmitting, active_station_name=""):
 
     inv_animator.draw(screen, font, sub_tabs_radio, sub_active_radio)
 
@@ -46,19 +47,37 @@ def draw_radio_tab(screen, font, sub_tabs_radio, sub_active_radio, current_time,
 
     start_y = 80
     for i, item in enumerate(items):
-        if i == selected_i:
+        # We define a standard box for each item line to keep drawing perfectly aligned
+        box_rect = pygame.Rect(15, start_y + (i * 30) - 2, 220, 22)
+        
+        is_hovered = (i == selected_i)
+        is_playing = (item == active_station_name)
+
+        if is_hovered:
             # If VFO mode is locked, flash the highlight box to let you know the dial is hijacked!
             if vfo_mode and selected_name == "MANUAL TUNE (VFO)" and current_time % 1000 < 500:
-                pygame.draw.rect(screen, active_theme.color, pygame.Rect(15, start_y + (i * 30) - 2, 220, 22), 2)
+                pygame.draw.rect(screen, active_theme.color, box_rect, 2)
                 item_text = font.render(item, True, active_theme.color)
             else:
-                pygame.draw.rect(screen, active_theme.color, pygame.Rect(15, start_y + (i * 30) - 2, 220, 22))
-                item_text = font.render(item, True, BLACK)
+                # Solid box for the hovered item
+                pygame.draw.rect(screen, active_theme.color, box_rect)
+                
+                # If you happen to be hovering over the station that is ALSO playing, give it a tiny visual indicator
+                display_text = f"> {item}" if is_playing else item
+                item_text = font.render(display_text, True, BLACK)
                 
             screen.blit(item_text, (20, start_y + (i * 30) - 2))
         else:
             item_text = font.render(item, True, active_theme.color)
-            screen.blit(item_text, (20, start_y + (i * 30))) 
+            
+            if is_playing:
+                # OUTLINE the station that is currently locked-in/playing!
+                # The '1' at the end of draw.rect tells Pygame to just draw the border
+                pygame.draw.rect(screen, active_theme.color, box_rect, 1)
+                screen.blit(item_text, (20, start_y + (i * 30) - 2)) 
+            else:
+                # Normal, non-selected, non-playing text
+                screen.blit(item_text, (20, start_y + (i * 30))) 
 
     # ==========================================
     # PUSH-TO-TALK LOGIC
@@ -76,6 +95,7 @@ def draw_radio_tab(screen, font, sub_tabs_radio, sub_active_radio, current_time,
     wave_box = pygame.Rect(WIDTH - 220, 100, 190, 80)
     pygame.draw.rect(screen, active_theme.color, wave_box, 2)
 
+    # Use the hovered item to show the preview wave, or switch to active_station_name if you want the wave to stay on the playing one!
     station_data = RADIO_DATABASE.get(selected_name, {"freq": "OFFLINE", "amp": 5, "speed": 0.001, "style": "simple"})
 
     mid_y = wave_box.centery
