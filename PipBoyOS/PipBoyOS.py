@@ -64,7 +64,7 @@ GPIO.output(PD_PIN, GPIO.LOW) # LOW means "Deep Sleep" on boot!
 
 # --- 1. SETUP ---
 pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 pygame.display.set_caption("Pip-Boy OS")
 
 font = pygame.font.Font("fallout.ttf", 14) 
